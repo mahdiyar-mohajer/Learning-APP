@@ -29,21 +29,6 @@
             </div>
         </div>
 
-        {{--        @if(session('success'))--}}
-        {{--            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-8 rounded-r-lg">--}}
-        {{--                <div class="flex">--}}
-        {{--                    <div class="flex-shrink-0">--}}
-        {{--                        <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
-        {{--                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />--}}
-        {{--                        </svg>--}}
-        {{--                    </div>--}}
-        {{--                    <div class="ml-3">--}}
-        {{--                        <p class="text-sm text-green-700">{{ session('success') }}</p>--}}
-        {{--                    </div>--}}
-        {{--                </div>--}}
-        {{--            </div>--}}
-        {{--        @endif--}}
-
         @foreach($commands as $category => $categoryCommands)
             <div class="mb-12">
                 <div class="flex items-center mb-6">
@@ -52,83 +37,88 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($categoryCommands as $command)
-                        <div
-                            class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-visible relative">
                             <div class="p-5 border-b border-gray-100">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-mono text-lg font-semibold text-gray-800">{{ $command->command }}</h3>
-                                    <div class="flex items-center space-x-2">
-                                        <a href="{{ route('commands.edit', $command->id) }}"
-                                           class="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                                           title="Edit">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                        </a>
-                                        <form action="{{ route('commands.destroy', $command->id) }}" method="POST"
-                                              onsubmit="return confirm('Are you sure you want to delete this command?');"
-                                              class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors duration-200"
-                                                    title="Delete">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                     viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2"
-                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                </svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
+                                <h3
+                                    class="font-mono text-lg font-semibold text-gray-800 cursor-pointer"
+                                    onclick="copyToClipboard('{{ $command->command }}')">
+                                    {{ $command->command }}
+                                </h3>
                                 <p class="mt-2 text-gray-600 text-sm">{{ $command->description }}</p>
                             </div>
-
-                            <!-- Command Details -->
                             <div class="p-5 space-y-4">
                                 @if($command->examples)
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                                    <div id="copy-success-popup"
+                                         class="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg opacity-0 transform transition-all duration-300 z-50">
+                                        <span id="copy-success-message">Copied to clipboard!</span>
+                                    </div>
+                                    <div class="relative group">
+                                        <button
+                                            class="example-button text-sm font-semibold text-gray-700 flex items-center hover:text-blue-600">
                                             <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor"
                                                  viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                             </svg>
                                             Examples
-                                        </h4>
-                                        <ul class="space-y-2">
-                                            @foreach($command->examples as $example)
-                                                <li class="text-sm text-gray-600 bg-gray-50 rounded-md p-2 font-mono">
-                                                    {{ $example }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
+                                            <svg
+                                                class="w-3 h-3 ml-2 text-gray-500 transform transition-transform duration-300 group-hover:rotate-180"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M19 9l-7 7-7-7"/>
+                                            </svg>
+                                        </button>
+                                        <div
+                                            class="example-popup absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hidden group-hover:block">
+                                            <h4 class="font-semibold text-gray-800 mb-2">Examples:</h4>
+                                            <ul class="space-y-2">
+                                                @foreach($command->examples as $example)
+                                                    <li
+                                                        class="text-sm text-gray-600 bg-gray-50 rounded-md p-2 font-mono cursor-pointer"
+                                                        onclick="copyToClipboard('{{ $example }}')">
+                                                        {{ $example }}
 
-                                @if($command->flags)
-                                    <div>
-                                        <h4 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative group">
+                                        <button
+                                            class="flag-button text-sm font-semibold text-gray-700 flex items-center hover:text-blue-600">
                                             <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor"
                                                  viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
                                             </svg>
                                             Flags
-                                        </h4>
-                                        <div class="grid grid-cols-1 gap-2">
-                                            @foreach($command->flags as $flag => $description)
-                                                <div class="text-sm bg-gray-50 rounded-md p-2">
-                                                    <span class="font-mono text-blue-600 font-medium">{{ $flag }}</span>
-                                                    <span class="text-gray-500 mx-2">-</span>
-                                                    <span class="text-gray-600">{{ $description }}</span>
-                                                </div>
-                                            @endforeach
+                                            <svg
+                                                class="w-3 h-3 ml-2 text-gray-500 transform transition-transform duration-300 group-hover:rotate-180"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M19 9l-7 7-7-7"/>
+                                            </svg>
+                                        </button>
+                                        <div
+                                            class="flag-popup absolute top-full left-0 mt-2 bg-white border rounded-lg shadow-lg p-4 w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hidden group-hover:block">
+                                            <h4 class="font-semibold text-gray-800 mb-2">Flags:</h4>
+                                            <div class="space-y-2">
+                                                @foreach($command->flags as $flag => $description)
+                                                    <div
+                                                        class="text-sm bg-gray-50 rounded-md p-2 cursor-pointer"
+                                                        onclick="copyToClipboard('{{ $flag }} - {{ $description }}')">
+                                                        <span
+                                                            class="font-mono text-blue-600 font-medium">{{ $flag }}</span>
+                                                        <span class="text-gray-500 mx-2">-</span>
+                                                        <span class="text-gray-600">{{ $description }}</span>
+
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
+
                                 @endif
                             </div>
                         </div>
@@ -138,3 +128,77 @@
         @endforeach
     </div>
 @endsection
+
+<script>
+    function copyToClipboard(text) {
+        var tempTextArea = document.createElement("textarea");
+        document.body.appendChild(tempTextArea);
+        tempTextArea.value = text;
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+
+        showCopySuccessPopup();
+    }
+
+    function showCopySuccessPopup() {
+        const popup = document.getElementById('copy-success-popup');
+        popup.classList.remove('opacity-0');
+        popup.classList.add('opacity-100');
+        setTimeout(() => {
+            popup.classList.remove('opacity-100');
+            popup.classList.add('opacity-0');
+        }, 2000);
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function togglePopup(button, popup, className) {
+            button.addEventListener('click', function (event) {
+                event.stopPropagation();
+                closeAllPopups();
+                popup.classList.toggle('hidden');
+                popup.classList.toggle('opacity-0');
+                popup.classList.toggle('opacity-100');
+            });
+        }
+
+        function closeAllPopups() {
+            document.querySelectorAll('.example-popup, .flag-popup').forEach(function (popup) {
+                popup.classList.add('hidden');
+                popup.classList.remove('opacity-100');
+                popup.classList.add('opacity-0');
+            });
+        }
+
+        function closePopupsOnClickOutside(popup) {
+            document.addEventListener('click', function (event) {
+                if (!popup.contains(event.target) && !popup.previousElementSibling.contains(event.target)) {
+                    popup.classList.add('hidden');
+                    popup.classList.remove('opacity-100');
+                    popup.classList.add('opacity-0');
+                }
+            });
+        }
+
+
+        document.querySelectorAll('.example-button').forEach(function (button) {
+            const popup = button.nextElementSibling;
+            togglePopup(button, popup, 'example-popup');
+            closePopupsOnClickOutside(popup);
+        });
+
+
+        document.querySelectorAll('.flag-button').forEach(function (button) {
+            const popup = button.nextElementSibling;
+            togglePopup(button, popup, 'flag-popup');
+            closePopupsOnClickOutside(popup);
+        });
+    });
+</script>
+
+
+
+
+
