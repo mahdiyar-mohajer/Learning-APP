@@ -21,11 +21,18 @@ class UserController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect()->intended('home');
+            $user = Auth::user(); // Get the authenticated user
+
+            if ($user->role === 'admin') {
+                return redirect()->intended('admin'); // Redirect to the admin panel
+            } elseif ($user->role === 'user') {
+                return redirect()->intended('dashboard'); // Redirect to the user dashboard
+            }
         }
 
         return redirect()->back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
+
 
     public function logout(Request $request)
     {

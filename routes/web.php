@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\LinuxCommandController;
 use App\Http\Controllers\UserController;
@@ -21,6 +22,11 @@ Route::prefix('commands')
         Route::delete('/{command}', [LinuxCommandController::class, 'destroy'])->name('commands.destroy');
         Route::get('/search', [LinuxCommandController::class, 'search'])->name('commands.search');
     });
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+//    Route::resource('/commands', LinuxCommandController::class);
+//    Route::resource('/users', UserController::class);
+});
 
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [UserController::class, 'login']);

@@ -40,7 +40,7 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-visible relative">
                             <div class="p-5 border-b border-gray-100">
                                 <h3
-                                    class="font-mono text-lg font-semibold text-gray-800 cursor-pointer"
+                                    class="font-mono text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-600"
                                     onclick="copyToClipboard('{{ $command->command }}')">
                                     {{ $command->command }}
                                 </h3>
@@ -129,7 +129,11 @@
     </div>
 @endsection
 
-<script>
+@push('scripts')
+    <script src="{{ asset('js/commands.js') }}"></script>
+@endpush
+
+{{-- <script>
     function copyToClipboard(text) {
         var tempTextArea = document.createElement("textarea");
         document.body.appendChild(tempTextArea);
@@ -196,7 +200,7 @@
             closePopupsOnClickOutside(popup);
         });
     });
-</script>
+</script> --}}
 
 
 
