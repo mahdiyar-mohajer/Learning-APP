@@ -8,6 +8,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->default('user')->after('email'); // Default role is 'user'
+            $table->boolean('active')->default(true);
         });
     }
 
@@ -15,6 +16,7 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('role');
+            $table->dropColumn('active');
         });
     }
 };

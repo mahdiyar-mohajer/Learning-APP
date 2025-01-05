@@ -22,10 +22,13 @@ Route::prefix('commands')
         Route::delete('/{command}', [LinuxCommandController::class, 'destroy'])->name('commands.destroy');
         Route::get('/search', [LinuxCommandController::class, 'search'])->name('commands.search');
     });
-Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
-    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-//    Route::resource('/commands', LinuxCommandController::class);
-//    Route::resource('/users', UserController::class);
+Route::middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/admin/users/{user}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::post('/admin/users/{user}/deactivate', [AdminController::class, 'deactivate'])->name('admin.users.deactivate');
+    Route::post('/admin/users/{user}/activate', [AdminController::class, 'activate'])->name('admin.users.activate');
 });
 
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');

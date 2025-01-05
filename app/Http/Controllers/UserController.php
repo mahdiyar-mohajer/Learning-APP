@@ -20,18 +20,29 @@ class UserController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
+        // Attempt to authenticate the user
         if (Auth::attempt($credentials)) {
             $user = Auth::user(); // Get the authenticated user
 
+            // Check if the user is active
+            if (!$user->active) {
+                // Log the user out and return an error message if inactive
+                Auth::logout();
+                return redirect()->back()->withErrors(['email' => 'Your account is deactivated. Please contact support.']);
+            }
+
+            // Check the user's role and redirect accordingly
             if ($user->role === 'admin') {
                 return redirect()->intended('admin'); // Redirect to the admin panel
             } elseif ($user->role === 'user') {
-                return redirect()->intended('dashboard'); // Redirect to the user dashboard
+                return redirect()->intended('/'); // Redirect to the user dashboard
             }
         }
 
+        // If authentication fails, show an error message
         return redirect()->back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
+
 
 
     public function logout(Request $request)
@@ -62,6 +73,6 @@ class UserController extends Controller
         ]);
 
         Auth::login($user);
-        return redirect('/index');
+        return redirect('/');
     }
 }
